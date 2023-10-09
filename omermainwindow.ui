@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>OmerMainWindow</class>
+ <widget class="QMainWindow" name="OmerMainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>OmerMainWindow</string>
+  </property>
+  <widget class="QWidget" name="m_CentralWidget">
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="Spelplan" name="m_pSpelplan" native="true"/>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QStatusBar" name="m_pStatusbar"/>
+  <widget class="QMenuBar" name="m_pMenubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>25</height>
+    </rect>
+   </property>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>Spelplan</class>
+   <extends>QWidget</extends>
+   <header>spelplan.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

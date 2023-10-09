@@ -1,0 +1,200 @@
+#include "spelplan.h"
+#include <QTimer>
+#include <QPainter>
+#include <QKeyEvent>
+#include <QPaintEvent>
+#include <chrono>
+#include <thread>
+#include <deque>
+using namespace std;
+
+
+Spelplan::Spelplan(QWidget *parent)
+    : QWidget(parent)
+{
+    QTimer *timer = new QTimer(this);
+    connect(timer,&QTimer :: timeout, this,&Spelplan ::uppdateraMasken);
+    timer->start(50);
+    setFocus();
+    m_rkHuvude=RK(50,50);
+    m_rkRiktning = RK(0,0);
+   m_fixedMatBit = slumpMatBit();
+
+}
+//{
+//    std::srand(std::time(nullptr));
+
+//        // Set the size of the widget
+//        setFixedSize(400, 400);
+
+//        // Set the starting direction of the snake
+//        m_rkRiktning = RK(0, 1);
+
+//        // Set the starting position of the snake's head
+//        m_rkHuvude = RK(10, 10);
+
+//        // Generate a random position for the first food item
+//        m_matBit = slumpMatBit();
+
+//        // Start the game timer
+//        startaSpelet();
+//}
+
+Spelplan::~Spelplan()
+{
+
+}
+
+void Spelplan::uppdateraMasken()
+{
+    //   m_masken.push_front(m_rkHuvude);
+
+    //      if (m_masken.size() > 100) {
+    //          m_masken.pop_back();
+    //      }
+    //m_rkHuvude.m_r +=m_rkRiktning.m_r;
+    //m_rkHuvude.m_k +=m_rkRiktning.m_k;
+    //update();
+    //}
+    for (auto it = m_masken.begin(); it != m_masken.end(); ++it) {
+        if (it->m_r == m_rkHuvude.m_r && it->m_k == m_rkHuvude.m_k) {
+            m_gameOver = true;
+            break;
+        }
+    }
+
+    // Add the new position of the head to the deque
+    m_masken.push_front(m_rkHuvude);
+
+    // Remove the last position of the tail if the deque is too long
+    if (m_masken.size() > 100) {
+        m_masken.pop_back();
+    }
+
+    // Update the position of the head
+    m_rkHuvude.m_r += m_rkRiktning.m_r;
+    m_rkHuvude.m_k += m_rkRiktning.m_k;
+
+    // Update the widget if the game is not over
+    if (!m_gameOver) {
+        update();
+    }
+}
+void Spelplan::keyPressEvent(QKeyEvent *event)
+{
+    int k=event->key();
+    if(k== Qt:: Key_Down) m_rkRiktning= RK(1,0);
+    if(k== Qt:: Key_Up) m_rkRiktning= RK(-1,0);
+    if(k== Qt:: Key_Left) m_rkRiktning= RK(0,-1);
+    if(k== Qt:: Key_Right) m_rkRiktning= RK(0,1);
+    //this_thread::sleep_for( chrono::seconds(30));
+}
+
+void Spelplan::paintEvent(QPaintEvent *event)
+//{
+
+// QPainter painter (this);
+
+//for(unsigned int i = 0; i<m_masken.size(); ++i){
+//    RK rk = m_masken[i];
+//    if(m_gameOver) {
+
+//    painter.fillRect(rk.m_k * m_cellstorlek,
+//                                  rk.m_r * m_cellstorlek,
+//                                  m_cellstorlek,
+//                                  m_cellstorlek,
+//                                  Qt::red);
+//     } else {
+//    painter.fillRect (rk.m_k*m_cellstorlek,
+//                      rk.m_r*m_cellstorlek,
+//                      m_cellstorlek,
+//                      m_cellstorlek,
+//                      Qt:: black);
+//}
+//}
+//    painter.fillRect(m_fixedMatBit.m_k * m_matbitstorlek,
+//                         m_fixedMatBit.m_r * m_matbitstorlek,
+//                         m_matbitstorlek, m_matbitstorlek, Qt::red);
+
+//QPainter painter (this);
+//painter.fillRect(rect(),Qt:: white);
+//painter.fillRect (m_rkHuvude.m_k*m_cellstorlek,
+//                  m_rkHuvude.m_r*m_cellstorlek,
+//                  m_cellstorlek,
+//                  m_cellstorlek,
+//                  Qt:: black);
+//
+{
+    QPainter painter(this);
+
+    // Draw the body of the snake
+    for (unsigned int i = 0; i < m_masken.size(); ++i) {
+        RK rk = m_masken[i];
+        if (m_gameOver) {
+            // Color the body red if the game is over
+            painter.fillRect(rk.m_k * m_cellstorlek,
+                             rk.m_r * m_cellstorlek,
+                             m_cellstorlek,
+                             m_cellstorlek,
+                             Qt::red);
+        } else {
+            painter.fillRect(rk.m_k * m_cellstorlek,
+                             rk.m_r * m_cellstorlek,
+                             m_cellstorlek,
+                             m_cellstorlek,
+                             Qt::black);
+        }
+    }
+
+    // Draw the fixed mat bit
+    RK m_fixedMatBit = slumpMatBit();
+    painter.fillRect(m_fixedMatBit.m_k * m_matbitstorlek,
+                     m_fixedMatBit.m_r * m_matbitstorlek,
+                     m_matbitstorlek, m_matbitstorlek, Qt::red);
+}
+
+
+Spelplan::RK Spelplan::slumpMatBit()
+{
+
+    int max_r = m_spelplan_hojd / m_matbitstorlek;
+    int max_k = m_spelplan_bredd / m_matbitstorlek;
+    int r = rand() % max_r;
+    int k = rand() % max_k;
+    return RK(r, k);
+
+}
+
+bool Spelplan::krockarMedMatBit(RK huvud)
+{
+    RK matBit = slumpMatBit();
+    return huvud.m_r == matBit.m_r && huvud.m_k == matBit.m_k;
+    return huvud.m_r == matBit.m_r  && huvud.m_k ==matBit.m_k;
+
+}
+bool Spelplan::krockarMedMasken(RK huvud)
+{
+    for (auto it = m_masken.begin(); it != m_masken.end(); ++it) {
+        if (it->m_r == huvud.m_r && it->m_k == huvud.m_k) {
+            return true;
+        }
+    }
+    return false;
+}
+bool Spelplan::krockarMedVaggen(RK& huvud)
+{
+    if (huvud.m_r < 0) {
+        huvud.m_r = width() / m_cellstorlek - 1;
+    } else if (huvud.m_r >= width() / m_cellstorlek) {
+        huvud.m_r = 0;
+    } else if (huvud.m_k < 0) {
+        huvud.m_k = height() / m_cellstorlek - 1;
+    } else if (huvud.m_k >= height() / m_cellstorlek) {
+        huvud.m_k = 0;
+    } else {
+        return false;
+    }
+
+    return true;
+}
+
