@@ -1,2 +1,2 @@
 # Maskspel
-Worm game using OOP  in C++
+snake game using OOP  in C++
